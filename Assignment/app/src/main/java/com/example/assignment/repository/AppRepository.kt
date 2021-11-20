@@ -38,17 +38,6 @@ class AppRepository(application: Application) {
         }
     }
 
-    private class DeleteDbAsyn(appDatabase: AppDatabase?) : AsyncTask<Void?, Void?, Void?>() {
-        private val listDataDao: ListDataDao = appDatabase!!.listdataDao()
-
-        override fun doInBackground(vararg p0: Void?): Void? {
-            Timber.e("==Delete data===")
-            listDataDao.deleteAll()
-            Timber.e("==Deleted data===")
-            return null
-        }
-    }
-
     init {
         listDataDao = database?.listdataDao()
         allListData = listDataDao?.getAllData()

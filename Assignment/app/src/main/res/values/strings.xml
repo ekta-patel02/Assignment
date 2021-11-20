@@ -4,4 +4,7 @@
     <string name="image">ImageContent</string>
     <string name="dummy_title">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text</string>
     <string name="dummy_description">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text</string>
+    <string name="pref_title">pref_title</string>
+    <string name="no_data_available">No data available</string>
+    <string name="error_msg">Something is wrong. Please try again later.</string>
 </resources>

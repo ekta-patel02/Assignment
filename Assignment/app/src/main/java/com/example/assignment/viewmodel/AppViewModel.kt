@@ -20,8 +20,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     val listData: MutableLiveData<List<ListData?>?> = MutableLiveData()
     val errormsg = MutableLiveData<String>()
-    val snackbarMsgStr = MutableLiveData<String>()
     val webserviceState = MutableLiveData<WebServiceState>()
+    val apptitle = MutableLiveData<String>()
 
     val appRepository: AppRepository = AppRepository(application)
 
@@ -37,6 +37,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun makeRequest() {
+        webserviceState.postValue(WebServiceState.PROCESSING)
         val retrofit = Retrofit.Builder()
             .baseUrl(Urls.baseurl)
             .addConverterFactory(GsonConverterFactory.create())
@@ -56,13 +57,17 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     appRepository.deleteData()
                     Timber.e("==inserting data===")
                     appRepository.insert(res?.listData ?: ArrayList())
-                    //Save title in sharedPref
+
+                    apptitle.postValue(res?.title.orEmpty())
+
+                    webserviceState.postValue(WebServiceState.SUCCESS)
                 }
             }
 
             override fun onFailure(call: Call<AppData?>, t: Throwable) {
                 Timber.e("ApiCall onFailure: ${t.message}")
                 errormsg.postValue(t.message)
+                webserviceState.postValue(WebServiceState.FAILED)
             }
         })
     }

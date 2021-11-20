@@ -8,6 +8,9 @@ import androidx.room.Query
 import com.example.assignment.model.ListData
 import com.example.assignment.utils.Urls
 
+/*
+* @Dao used to fetch/update/delete/edit data from db
+* */
 @Dao
 interface ListDataDao {
 

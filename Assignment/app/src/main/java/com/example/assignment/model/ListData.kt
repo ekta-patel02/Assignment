@@ -7,7 +7,9 @@ import androidx.room.PrimaryKey
 import com.example.assignment.utils.Urls
 import com.google.gson.annotations.SerializedName
 import org.jetbrains.annotations.NotNull
-
+/*
+* @Entity used to create table having defined column upon parameters.
+* */
 @Entity(tableName = Urls.TABLE_NAME, indices = [Index(value = ["id"], unique = true)])
 data class ListData(
     @NotNull
