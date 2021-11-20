@@ -1,19 +1,14 @@
 package com.example.assignment
 
-import dagger.android.*
-import com.example.assignment.di.component.DaggerAppComponent
+import android.app.Application
+import timber.log.Timber
 
-
-class AssignmentApp: DaggerApplication() {
+class AssignmentApp: Application() {
     override fun onCreate() {
         super.onCreate()
         if(BuildConfig.DEBUG){
             //turn on logs
+            Timber.plant(Timber.DebugTree())
         }
     }
-
-    override fun applicationInjector(): AndroidInjector<out DaggerApplication> {
-        return DaggerAppComponent.factory().create(this);
-    }
-
 }
