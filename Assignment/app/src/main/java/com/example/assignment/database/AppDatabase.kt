@@ -15,11 +15,13 @@ import java.util.concurrent.Executors
 @Database(entities = [ListData::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun listdataDao(): ListDataDao
-    internal class PopulateDbAsyn(appDatabase: AppDatabase?) : AsyncTask<Void?, Void?, Void?>() {
+    internal class DeleteDbAsyn(appDatabase: AppDatabase?) : AsyncTask<Void?, Void?, Void?>() {
         private val listDataDao: ListDataDao = appDatabase!!.listdataDao()
 
         override fun doInBackground(vararg p0: Void?): Void? {
+            Timber.e("==Delete data===")
             listDataDao.deleteAll()
+            Timber.e("==Deleted data===")
             return null
         }
     }
@@ -47,7 +49,8 @@ abstract class AppDatabase : RoomDatabase() {
         var callback: Callback = object : Callback() {
             override fun onOpen(db: SupportSQLiteDatabase) {
                 super.onOpen(db)
-                PopulateDbAsyn(INSTANCE)
+                Timber.e("==open db call Delete data===")
+                DeleteDbAsyn(INSTANCE)
             }
 
             override fun onCreate(db: SupportSQLiteDatabase) {

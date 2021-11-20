@@ -52,6 +52,9 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
                     val res: AppData? = response.body()
                     Timber.d("Success: " + res?.title + " Size: ${res?.listData?.size}")
                     //insert list in DB
+                    Timber.e("==Delete data before insert===")
+                    appRepository.deleteData()
+                    Timber.e("==inserting data===")
                     appRepository.insert(res?.listData ?: ArrayList())
                     //Save title in sharedPref
                 }

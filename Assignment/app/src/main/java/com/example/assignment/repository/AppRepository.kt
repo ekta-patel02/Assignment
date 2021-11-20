@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import com.example.assignment.database.AppDatabase
 import com.example.assignment.database.ListDataDao
 import com.example.assignment.model.ListData
+import timber.log.Timber
 
 class AppRepository(application: Application) {
 
@@ -17,20 +18,33 @@ class AppRepository(application: Application) {
         InsertAsyncTask(listDataDao).execute(lists)
     }
 
+    fun deleteData() {
+        Timber.e("==Repo Delete data===")
+        AppDatabase.DeleteDbAsyn(database).execute()
+    }
+
     val getAllListData: LiveData<List<ListData?>?>?
         get() = allListData
 
     private class InsertAsyncTask(listDao: ListDataDao?) :
         AsyncTask<List<ListData?>?, Void?, Void?>() {
-        private val listDataDao: ListDataDao?
+        private val listDataDao = listDao
 
-
-        init {
-            listDataDao = listDao
-        }
 
         override fun doInBackground(vararg lists: List<ListData?>?): Void? {
             listDataDao?.insert(lists[0])
+            Timber.e("==inserted data===")
+            return null
+        }
+    }
+
+    private class DeleteDbAsyn(appDatabase: AppDatabase?) : AsyncTask<Void?, Void?, Void?>() {
+        private val listDataDao: ListDataDao = appDatabase!!.listdataDao()
+
+        override fun doInBackground(vararg p0: Void?): Void? {
+            Timber.e("==Delete data===")
+            listDataDao.deleteAll()
+            Timber.e("==Deleted data===")
             return null
         }
     }
