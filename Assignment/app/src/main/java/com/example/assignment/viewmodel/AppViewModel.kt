@@ -7,6 +7,7 @@ import com.example.assignment.model.AppData
 import com.example.assignment.model.ListData
 import com.example.assignment.repository.AppDataApi
 import com.example.assignment.repository.AppRepository
+import com.example.assignment.utils.NetworkUtils
 import com.example.assignment.utils.Urls
 import com.example.assignment.utils.WebServiceState
 import retrofit2.Call
@@ -19,9 +20,10 @@ import timber.log.Timber
 class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     val listData: MutableLiveData<List<ListData?>?> = MutableLiveData()
-    val errormsg = MutableLiveData<String>()
+    val errorMsg = MutableLiveData<String>()
+    val isInternetNotAvailable = MutableLiveData<Boolean>()
     val webserviceState = MutableLiveData<WebServiceState>()
-    val apptitle = MutableLiveData<String>()
+    val appTitle = MutableLiveData<String>()
 
     val appRepository: AppRepository = AppRepository(application)
 
@@ -29,11 +31,18 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         val dbList = appRepository.getAllListData?.value
         if (!dbList.isNullOrEmpty()) {
             listData.postValue(dbList)
+        } else {
+            getAllAppData()
         }
     }
 
     fun getAllAppData() {
-        makeRequest()
+        if (!NetworkUtils.hasNetwork(getApplication())) {
+            isInternetNotAvailable.postValue(true)
+        } else {
+            isInternetNotAvailable.postValue(false)
+            makeRequest()
+        }
     }
 
     private fun makeRequest() {
@@ -51,25 +60,22 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             ) {
                 if (response.isSuccessful) {
                     val res: AppData? = response.body()
-                    Timber.d("Success: " + res?.title + " Size: ${res?.listData?.size}")
+                    Timber.d("Success: ${res?.title} Size: ${res?.listData?.size}")
                     //insert list in DB
                     Timber.e("==Delete data before insert===")
                     appRepository.deleteData()
                     Timber.e("==inserting data===")
                     appRepository.insert(res?.listData ?: ArrayList())
-
-                    apptitle.postValue(res?.title.orEmpty())
-
+                    appTitle.postValue(res?.title.orEmpty())
                     webserviceState.postValue(WebServiceState.SUCCESS)
                 }
             }
 
             override fun onFailure(call: Call<AppData?>, t: Throwable) {
                 Timber.e("ApiCall onFailure: ${t.message}")
-                errormsg.postValue(t.message)
+                errorMsg.postValue(t.message)
                 webserviceState.postValue(WebServiceState.FAILED)
             }
         })
     }
-
 }

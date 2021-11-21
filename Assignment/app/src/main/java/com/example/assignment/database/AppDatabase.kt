@@ -1,7 +1,6 @@
 package com.example.assignment.database
 
 import android.content.Context
-import android.os.AsyncTask
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -12,17 +11,7 @@ import timber.log.Timber
 
 @Database(entities = [ListData::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun listdataDao(): ListDataDao
-    internal class DeleteDbAsyn(appDatabase: AppDatabase?) : AsyncTask<Void?, Void?, Void?>() {
-        private val listDataDao: ListDataDao = appDatabase!!.listdataDao()
-
-        override fun doInBackground(vararg p0: Void?): Void? {
-            Timber.e("==Delete data===")
-            listDataDao.deleteAll()
-            Timber.e("==Deleted data===")
-            return null
-        }
-    }
+    abstract fun listDataDao(): ListDataDao
 
     companion object {
         private const val DATABASE_NAME = Urls.DB_NAME
@@ -44,11 +33,10 @@ abstract class AppDatabase : RoomDatabase() {
             return INSTANCE
         }
 
-        var callback: Callback = object : Callback() {
+        private var callback: Callback = object : Callback() {
             override fun onOpen(db: SupportSQLiteDatabase) {
                 super.onOpen(db)
                 Timber.e("==open db call Delete data===")
-                DeleteDbAsyn(INSTANCE)
             }
 
             override fun onCreate(db: SupportSQLiteDatabase) {

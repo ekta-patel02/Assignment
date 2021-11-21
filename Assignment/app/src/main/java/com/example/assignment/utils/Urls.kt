@@ -2,7 +2,6 @@ package com.example.assignment.utils
 
 class Urls {
     companion object{
-        const val assignmentDataUrl = "/s/2iodh4vg0eortkl/facts.json"
         const val baseurl = "https://dl.dropboxusercontent.com"
         const val getAssignmentDataUrl = "/s/2iodh4vg0eortkl/facts.json"
 

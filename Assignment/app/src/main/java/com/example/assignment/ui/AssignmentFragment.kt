@@ -16,7 +16,6 @@ import com.example.assignment.R
 import com.example.assignment.databinding.FragmentAssignmentBinding
 import com.example.assignment.model.ListData
 import com.example.assignment.ui.adapter.ListDataAdapter
-import com.example.assignment.utils.NetworkUtils
 import com.example.assignment.utils.WebServiceState
 import com.example.assignment.viewmodel.AppViewModel
 import com.google.android.material.snackbar.Snackbar
@@ -51,9 +50,15 @@ class AssignmentFragment : Fragment() {
     private val errorMsgObserver = Observer<String> {
         //show offline : if loaded from cache and network call fails then show a message
         //If no Data available then show a message below actionBar
-        Snackbar.make(rvList, getString(R.string.error_msg), Snackbar.LENGTH_LONG).show()
+        Snackbar.make(rvList, it, Snackbar.LENGTH_LONG).show()
     }
 
+    private val internetNotAvailableObserver = Observer<Boolean> {
+        if (it)
+            txtOfflineStatus.visibility = View.VISIBLE
+        else
+            txtOfflineStatus.visibility = View.GONE
+    }
 
     private val appTitleObserver = Observer<String> {
         val sharedPreferences: SharedPreferences? =
@@ -63,8 +68,8 @@ class AssignmentFragment : Fragment() {
         myEdit?.apply()
 
         (activity as? AppCompatActivity)?.supportActionBar?.title = it
-
     }
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -94,25 +99,13 @@ class AssignmentFragment : Fragment() {
         rvList.setHasFixedSize(true)
         rvList.layoutManager = LinearLayoutManager(requireContext())
 
+        updateTitle()
         setSwipeRefresh()
-        fetchListData()
     }
 
     private fun setSwipeRefresh() {
         swipeRefresh.setOnRefreshListener {
             swipeRefresh.isRefreshing = false
-            fetchListData()
-        }
-    }
-
-    private fun fetchListData() {
-        //check if data in Database then load or else call app
-        if (!NetworkUtils.hasNetwork(requireActivity())) {
-            appViewModel.errormsg.postValue(getString(R.string.please_check_your_internet_connection))
-            updateTitle()
-            if (swipeRefresh.isRefreshing)
-                swipeRefresh.isRefreshing = false
-        } else {
             appViewModel.getAllAppData()
         }
     }
@@ -126,8 +119,9 @@ class AssignmentFragment : Fragment() {
 
     private fun observerSetUp() {
         appViewModel.webserviceState.observe(viewLifecycleOwner, webServiceObserver)
-        appViewModel.errormsg.observe(viewLifecycleOwner, errorMsgObserver)
-        appViewModel.apptitle.observe(viewLifecycleOwner, appTitleObserver)
+        appViewModel.errorMsg.observe(viewLifecycleOwner, errorMsgObserver)
+        appViewModel.isInternetNotAvailable.observe(this, internetNotAvailableObserver)
+        appViewModel.appTitle.observe(viewLifecycleOwner, appTitleObserver)
         appViewModel.listData.observe(viewLifecycleOwner, listDataObserver)
         appViewModel.appRepository.listDataDao?.getAllData()?.observe(this,
             {
