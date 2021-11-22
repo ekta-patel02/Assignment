@@ -15,15 +15,10 @@ class AppRepository(application: Application) {
     private var allListData: LiveData<List<ListData?>?>?
     private val database: AppDatabase? = AppDatabase.getInstance(application)
 
-    fun insert(lists: List<ListData?>?) {
-        CoroutineScope(Dispatchers.IO).launch {
-            listDataDao?.insert(lists)
-        }
-    }
-
-    fun deleteData() {
+    fun deleteAndInsertData(lists: List<ListData?>?) {
         CoroutineScope(Dispatchers.IO).launch {
             listDataDao?.deleteAll()
+            listDataDao?.insert(lists)
         }
     }
 

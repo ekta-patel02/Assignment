@@ -15,7 +15,6 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import timber.log.Timber
 
 class AppViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -25,7 +24,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     val webserviceState = MutableLiveData<WebServiceState>()
     val appTitle = MutableLiveData<String>()
 
-    val appRepository: AppRepository = AppRepository(application)
+    private val appRepository: AppRepository = AppRepository(application)
 
     init {
         val dbList = appRepository.getAllListData?.value
@@ -60,19 +59,13 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             ) {
                 if (response.isSuccessful) {
                     val res: AppData? = response.body()
-                    Timber.d("Success: ${res?.title} Size: ${res?.listData?.size}")
-                    //insert list in DB
-                    Timber.e("==Delete data before insert===")
-                    appRepository.deleteData()
-                    Timber.e("==inserting data===")
-                    appRepository.insert(res?.listData ?: ArrayList())
+                    appRepository.deleteAndInsertData(res?.listData ?: ArrayList())
                     appTitle.postValue(res?.title.orEmpty())
                     webserviceState.postValue(WebServiceState.SUCCESS)
                 }
             }
 
             override fun onFailure(call: Call<AppData?>, t: Throwable) {
-                Timber.e("ApiCall onFailure: ${t.message}")
                 errorMsg.postValue(t.message)
                 webserviceState.postValue(WebServiceState.FAILED)
             }

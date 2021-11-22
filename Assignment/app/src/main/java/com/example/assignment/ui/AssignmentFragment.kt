@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.assignment.R
 import com.example.assignment.databinding.FragmentAssignmentBinding
 import com.example.assignment.model.ListData
+import com.example.assignment.repository.AppRepository
 import com.example.assignment.ui.adapter.ListDataAdapter
 import com.example.assignment.utils.WebServiceState
 import com.example.assignment.viewmodel.AppViewModel
@@ -25,6 +26,7 @@ class AssignmentFragment : Fragment() {
 
     private lateinit var appViewModel: AppViewModel
     private lateinit var adapter: ListDataAdapter
+    private lateinit var appRepository: AppRepository
 
     private val listDataObserver = Observer<List<ListData?>?> {
         //ui update
@@ -82,22 +84,22 @@ class AssignmentFragment : Fragment() {
         return binding.root
     }
 
-    override fun onStart() {
-        super.onStart()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         init()
     }
 
     private fun init() {
+        appRepository = AppRepository(requireActivity().application)
         setViewModel()
         observerSetUp()
         viewSetUp()
     }
 
     private fun viewSetUp() {
-        adapter =
-            ListDataAdapter(appViewModel.listData.value)
-        rvList.setHasFixedSize(true)
         rvList.layoutManager = LinearLayoutManager(requireContext())
+        rvList.setHasFixedSize(true)
+        adapter = ListDataAdapter(appViewModel.listData.value)
 
         updateTitle()
         setSwipeRefresh()
@@ -123,7 +125,7 @@ class AssignmentFragment : Fragment() {
         appViewModel.isInternetNotAvailable.observe(this, internetNotAvailableObserver)
         appViewModel.appTitle.observe(viewLifecycleOwner, appTitleObserver)
         appViewModel.listData.observe(viewLifecycleOwner, listDataObserver)
-        appViewModel.appRepository.listDataDao?.getAllData()?.observe(this,
+        appRepository.listDataDao?.getAllData()?.observe(this,
             {
                 //onchange
                 appViewModel.listData.postValue(it)

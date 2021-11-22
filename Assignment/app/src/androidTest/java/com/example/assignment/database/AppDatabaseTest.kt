@@ -21,7 +21,7 @@ class AppDatabaseTest: TestCase(){
     public override fun setUp() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
-        dao = db.listdataDao()
+        dao = db.listDataDao()
     }
 
     @After
@@ -30,7 +30,7 @@ class AppDatabaseTest: TestCase(){
     }
 
     @Test
-    fun WriteData(){
+    fun writeData(){
         val listData = ListData(1,"TestTitle","TestDescription",null)
         val list = ArrayList<ListData>()
         list.add(listData)
